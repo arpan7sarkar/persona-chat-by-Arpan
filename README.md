@@ -75,41 +75,19 @@ Navigate to `http://localhost:3000`
 personas/
 ├── public/
 │   ├── index.html          # Landing page & chat interface
+│   ├── chat.html           # Alternate chat page
 │   ├── script.js           # Frontend JavaScript
-│   └── images/             # Avatar images
+│   ├── images/             # Avatar images
+│   ├── styles.css          # Custom styles
 ├── hitesh.js               # Hitesh persona configuration
 ├── piyush.js               # Piyush persona configuration  
 ├── server.js               # Express.js backend
 ├── package.json            # Dependencies
 ├── vercel.json             # Vercel deployment config
-├── .env                    # Environment variables
+├── .env.example            # Environment template
+├── .gitignore              # Git ignore rules
+├── hiesh.txt               # Misc file
 └── README.md               # This file
-```
-
-## 🚀 Deployment to Vercel
-
-### Method 1: Vercel CLI (Recommended)
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel
-
-# Set environment variable
-vercel env add GEMINI_API_KEY
-```
-
-### Method 2: GitHub Integration
-1. Push code to GitHub repository
-2. Connect repository to Vercel
-3. Add `GEMINI_API_KEY` in Vercel dashboard → Settings → Environment Variables
-4. Deploy automatically
-
-### Environment Variables for Production
-```env
-GEMINI_API_KEY=your_gemini_api_key
-NODE_ENV=production
 ```
 
 ## 🔧 API Endpoints

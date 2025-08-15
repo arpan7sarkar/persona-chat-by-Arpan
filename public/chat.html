@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat with AI Personas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-dark min-h-screen font-inter">
+    <!-- Chat Interface Only -->
+    <div id="chatInterface" class="chat-container">
+        <!-- Floating Background Elements -->
+        <div class="absolute top-10 left-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl animate-float"></div>
+        <div class="absolute bottom-20 right-20 w-40 h-40 bg-secondary/5 rounded-full blur-3xl animate-float" style="animation-delay: 1.5s;"></div>
+        
+        <!-- Header -->
+        <header class="chat-header sticky top-0 z-20">
+            <div class="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
+                <a href="index.html" onclick="goBack(); return false;" class="flex items-center text-gray-300 hover:text-white transition-all duration-300 group bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full backdrop-blur-sm">
+                    <svg class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    <span class="font-medium">Back</span>
+                </a>
+                
+                <div id="personaHeader" class="flex items-center space-x-4">
+                    <div id="personaAvatar" class="w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold shadow-2xl avatar-glow"></div>
+                    <div>
+                        <h2 id="personaName" class="font-bold text-white text-lg"></h2>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
+                            <span class="text-sm text-gray-400 font-medium">Online • AI Assistant</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <div class="bg-white/5 px-3 py-1.5 rounded-full backdrop-blur-sm">
+                        <div class="flex items-center space-x-2 text-gray-400">
+                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <span class="text-sm font-medium">AI Powered</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Chat Messages Container -->
+        <main class="flex-1 relative z-10">
+            <div class="max-w-6xl mx-auto px-6 py-8">
+                <div id="chatMessages" class="space-y-6 mb-8 min-h-[65vh] custom-scrollbar overflow-y-auto"></div>
+
+                <!-- Typing Indicator -->
+                <div id="typingIndicator" class="hidden mb-6 animate-slideUp">
+                    <div class="flex items-start space-x-4 max-w-4xl">
+                        <div class="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center flex-shrink-0 avatar-glow">
+                            <span class="text-primary text-sm font-bold">AI</span>
+                        </div>
+                        <div class="message-ai px-6 py-4 max-w-xs">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-sm font-medium text-white">AI Assistant</span>
+                                <span class="text-xs text-gray-500">is typing...</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <div class="typing-indicator"></div>
+                                <div class="typing-indicator"></div>
+                                <div class="typing-indicator"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="sticky bottom-0 pt-6">
+                    <div class="max-w-4xl mx-auto">
+                        <div class="input-container p-4">
+                            <div class="flex items-end space-x-4">
+                                <div class="flex-1">
+                                    <textarea 
+                                        id="messageInput" 
+                                        placeholder="Type your message here... Press Enter to send, Shift+Enter for new line"
+                                        class="w-full resize-none border-0 focus:ring-0 focus:outline-none text-white placeholder-gray-400 bg-transparent text-base leading-relaxed"
+                                        rows="1"
+                                        style="max-height: 120px; min-height: 24px;"
+                                    ></textarea>
+                                </div>
+                                <button 
+                                    id="sendButton"
+                                    onclick="sendMessage()" 
+                                    class="send-button flex-shrink-0"
+                                    disabled
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
+        <div class="glass-effect rounded-3xl p-8 max-w-sm mx-4 text-center border border-primary/20">
+            <div class="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p class="text-white font-medium">Initializing AI conversation...</p>
+            <p class="text-gray-400 text-sm mt-2">Please wait a moment</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

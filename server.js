@@ -63,21 +63,68 @@ const PREFERRED_MODELS = [
   'gemini-pro'
 ];
 
+// Simple sleep utility for backoff
+function sleep(ms) { return new Promise(res => setTimeout(res, ms)); }
+
+// Identify transient/retriable errors
+function isRetriableError(err) {
+  const msg = (err?.message || '').toLowerCase();
+  const code = String(err?.status || err?.code || '');
+  return (
+    msg.includes('overloaded') ||
+    msg.includes('temporarily unavailable') ||
+    msg.includes('timeout') ||
+    msg.includes('rate') ||
+    msg.includes('try again') ||
+    msg.includes('503') ||
+    msg.includes('502') ||
+    msg.includes('504') ||
+    code === '429' || code === '502' || code === '503' || code === '504'
+  );
+}
+
 async function generateWithFallback(prompt) {
   let lastErr;
+  const MAX_RETRIES = Number(process.env.GENAI_MAX_RETRIES || 3);
+  const BASE_DELAY_MS = Number(process.env.GENAI_BASE_DELAY_MS || 500);
+
   for (const modelName of PREFERRED_MODELS) {
-    try {
-      const model = genAI.getGenerativeModel({ model: modelName });
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      return response.text();
-    } catch (err) {
-      lastErr = err;
-      // Try next model if the error suggests model issues, otherwise break
-      const msg = (err?.message || '').toLowerCase();
-      const retriable = msg.includes('not found') || msg.includes('unknown') || msg.includes('unsupported') || msg.includes('invalid') || msg.includes('404');
-      if (!retriable) break;
+    let attempt = 0;
+    while (attempt < MAX_RETRIES) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        return response.text();
+      } catch (err) {
+        lastErr = err;
+        const msg = (err?.message || '').toLowerCase();
+        const modelIssue = (
+          msg.includes('not found') || msg.includes('unknown') || msg.includes('unsupported') || msg.includes('invalid') || msg.includes('404')
+        );
+
+        // Retry on transient errors
+        if (isRetriableError(err) && attempt < MAX_RETRIES - 1) {
+          const jitter = Math.floor(Math.random() * 200);
+          const backoff = BASE_DELAY_MS * Math.pow(2, attempt) + jitter;
+          await sleep(backoff);
+          attempt += 1;
+          continue;
+        }
+
+        // If it's a model issue, break out of retries and try next model
+        if (modelIssue) {
+          break;
+        }
+
+        // Non-retriable, non-model issue: stop trying other models
+        attempt = MAX_RETRIES; // exit loop
+        break;
+      }
     }
+
+    // If we finished retries due to transient errors or model issue, move to next model
+    continue;
   }
   throw lastErr;
 }
@@ -144,8 +191,13 @@ Now respond as ${selectedPersona === 'hitesh' ? 'Hitesh Choudhary' : 'Piyush Gar
 
   } catch (error) {
     console.error('Chat API Error:', error);
-    res.status(500).json({ 
-      error: 'Failed to generate response. Please check your API key, internet connection, and server logs.',
+    const msg = (error?.message || '').toLowerCase();
+    const isOverloaded = msg.includes('overloaded') || msg.includes('503');
+    const status = isOverloaded ? 503 : 500;
+    res.status(status).json({ 
+      error: isOverloaded
+        ? 'Model is temporarily overloaded. We retried a few times—please try again shortly.'
+        : 'Failed to generate response. Please check your API key, internet connection, and server logs.',
       details: NODE_ENV === 'development' ? (error?.message || String(error)) : undefined
     });
   }

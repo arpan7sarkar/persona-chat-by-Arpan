@@ -50,7 +50,7 @@ async function loadPersonaData() {
                 name: 'Piyush Garg',
                 title: 'Full-Stack Developer & Teachyst Founder',
                 description: 'Full-stack developer with 5+ years industry experience. 275K+ YouTube subscribers. Focus on project-based learning.',
-                avatar: 'https://avatars.githubusercontent.com/u/44976328?v=4',
+                avatar: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fyt3.googleusercontent.com%2Fytc%2FAIdro_k7rVfo5FgCqk4zP1BZJrjPTHPEY1Ijuz6hj8ogolyy3HN4%3Ds900-c-k-c0x00ffffff-no-rj&f=1&nofb=1&ipt=41d67241f610b63d7a2bbe31b71774f857a93cc6df0ffbab7c43f45df4e45138',
                 specialties: ['Full-Stack', 'MERN', 'System Design', 'Open Source', 'Real Projects'],
                 greeting: "Hey everyone! Ready to build some real-world applications? Let's get started! 🚀"
             }
@@ -100,10 +100,14 @@ function setupChatInterface() {
     const avatar = document.getElementById('personaAvatar');
     const name = document.getElementById('personaName');
 
-    avatar.textContent = persona.name.split(' ').map(n => n[0]).join('');
     avatar.className = `w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold shadow-2xl avatar-glow ${
         currentPersona === 'hitesh' ? 'bg-gradient-to-br from-orange-500 to-red-600' : 'bg-gradient-to-br from-blue-500 to-purple-600'
     }`;
+    if (persona.avatar) {
+        avatar.innerHTML = `<img src="${persona.avatar}" alt="${persona.name}" class="w-14 h-14 rounded-2xl object-cover" />`;
+    } else {
+        avatar.textContent = persona.name.split(' ').map(n => n[0]).join('');
+    }
     
     name.textContent = persona.name;
 
@@ -150,8 +154,8 @@ function addMessage(content, sender, isWelcome = false) {
     } else {
         messageDiv.innerHTML = `
             <div class="flex items-start space-x-4 w-full max-w-4xl">
-                <div class="w-12 h-12 ${currentPersona === 'hitesh' ? 'bg-gradient-to-br from-orange-500 to-red-600' : 'bg-gradient-to-br from-blue-500 to-purple-600'} rounded-2xl flex items-center justify-center text-white text-sm font-bold shadow-2xl flex-shrink-0 avatar-glow">
-                    ${persona.name.split(' ').map(n => n[0]).join('')}
+                <div class="w-12 h-12 ${currentPersona === 'hitesh' ? 'bg-gradient-to-br from-orange-500 to-red-600' : 'bg-gradient-to-br from-blue-500 to-purple-600'} rounded-2xl flex items-center justify-center text-white text-sm font-bold shadow-2xl flex-shrink-0 avatar-glow overflow-hidden">
+                    ${persona.avatar ? `<img src="${persona.avatar}" alt="${persona.name}" class="w-12 h-12 rounded-2xl object-cover" />` : persona.name.split(' ').map(n => n[0]).join('')}
                 </div>
                 <div class="message-ai px-6 py-4 flex-1 min-w-0">
                     ${!isWelcome ? `

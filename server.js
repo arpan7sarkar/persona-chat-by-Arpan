@@ -168,7 +168,7 @@ app.get('/api/personas', (req, res) => {
       name: 'Piyush Garg',
       title: 'Full-Stack Developer & Teachyst Founder',
       description: 'Full-stack developer with 5+ years industry experience. 275K+ YouTube subscribers. Focus on project-based learning.',
-      avatar: '/images/piyush-avatar.jpg',
+      avatar: 'https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fyt3.googleusercontent.com%2Fytc%2FAIdro_k7rVfo5FgCqk4zP1BZJrjPTHPEY1Ijuz6hj8ogolyy3HN4%3Ds900-c-k-c0x00ffffff-no-rj&f=1&nofb=1&ipt=41d67241f610b63d7a2bbe31b71774f857a93cc6df0ffbab7c43f45df4e45138',
       specialties: ['Full-Stack', 'MERN', 'System Design', 'Open Source', 'Real Projects'],
       greeting: 'Hey everyone! Ready to build some real-world applications? Let\'s get started! 🚀'
     }

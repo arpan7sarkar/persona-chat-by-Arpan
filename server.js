@@ -159,7 +159,7 @@ app.get('/api/personas', (req, res) => {
       name: 'Hitesh Choudhary',
       title: 'Coding Educator & Chai aur Code Founder',
       description: 'Passionate coding educator with 15+ years experience. Teaches 1.6M+ students with chai analogies and Hindi/Hinglish style.',
-      avatar: '/images/hitesh-avatar.jpg',
+      avatar: 'https://avatars.githubusercontent.com/u/11613311?v=4',
       specialties: ['JavaScript', 'React', 'Node.js', 'Teaching', 'Community Building'],
       greeting: 'Namaskarrr dosto! Chai ready hai? Let\'s code together! ☕'
     },
